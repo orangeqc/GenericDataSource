@@ -129,6 +129,13 @@ public class AbstractDataSource : NSObject, DataSource, UITableViewDataSource, U
         return castedCell
     }
 
+    /**
+     `UITableViewDataSource` forwards calls to the corresponding `DataSource` method (see `ds_collectionView(collectionView:, titleForHeaderAtSection:) -> String?`)
+     */
+    public func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return ds_collectionView(tableView, titleForHeaderAtSection: section)
+    }
+
     // MARK:- UICollectionViewDataSource
 
     
@@ -259,7 +266,7 @@ public class AbstractDataSource : NSObject, DataSource, UITableViewDataSource, U
         return ds_collectionView(collectionView, shouldSelectItemAtIndexPath: indexPath)
     }
     
-    /**
+    /*
      `UICollectionViewDataSource`/`UICollectionViewDelegateFlowLayout` implementations forwards calls to the corresponding `DataSource` methods.
      */
     public func collectionView(collectionView: UICollectionView, didDeselectItemAtIndexPath indexPath: NSIndexPath) {
@@ -333,6 +340,10 @@ public class AbstractDataSource : NSObject, DataSource, UITableViewDataSource, U
      */
     public func ds_collectionView(collectionView: GeneralCollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> ReusableCell {
         fatalError("\(self): \(#function) Should be implemented by subclasses")
+    }
+
+    public func ds_collectionView(collectionView: GeneralCollectionView, titleForHeaderAtSection section: Int) -> String? {
+        return nil
     }
 
     /**

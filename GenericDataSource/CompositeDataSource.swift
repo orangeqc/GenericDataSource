@@ -252,6 +252,12 @@ public class CompositeDataSource: AbstractDataSource {
         return mapping.dataSource.ds_collectionView(mapping.wrapperView, cellForItemAtIndexPath: mapping.localIndexPath)
     }
 
+    public override func ds_collectionView(collectionView: GeneralCollectionView, titleForHeaderAtSection section: Int) -> String? {
+
+        let mapping = collection.collectionViewWrapperFromSection(section, collectionView: collectionView)
+        return mapping.dataSource.ds_collectionView(mapping.wrapperView, titleForHeaderAtSection: mapping.localSection)
+    }
+
     // MARK: Size
 
     /**

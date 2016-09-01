@@ -23,6 +23,9 @@ public class BasicDataSource<ItemType, CellType: ReusableCell> : AbstractDataSou
 
     private var itemSizeSet: Bool = false
 
+    /// Title for the section.
+    public var titleForHeader: String?
+
     /// The size of the cell. Usually used with a `UICollectionView`.
     /// When setting a value to it. It will set `useDelegateForItemSize` to `true`.
     public var itemSize: CGSize = CGSize.zero {
@@ -338,6 +341,10 @@ public class BasicDataSource<ItemType, CellType: ReusableCell> : AbstractDataSou
             return super.ds_collectionView(collectionView, didDeselectItemAtIndexPath: indexPath)
         }
         selectionHandler.dataSource(self, collectionView: collectionView, didDeselectItemAtIndexPath: indexPath)
+    }
+
+    public override func ds_collectionView(collectionView: GeneralCollectionView, titleForHeaderAtSection section: Int) -> String? {
+        return self.titleForHeader
     }
 }
 

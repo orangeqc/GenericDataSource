@@ -131,4 +131,14 @@ import Foundation
      - parameter indexPath:      An index path locating an item in the view.
      */
     func ds_collectionView(collectionView: GeneralCollectionView, didDeselectItemAtIndexPath indexPath: NSIndexPath)
+
+    /**
+     Asks the delegate for the title for a given section.
+     
+     - parameter collectionView: A general collection view object initiating the operation.
+     - parameter section:        An index number identifying a section.
+     
+     - returns: Optional string for the section title.
+     */
+    func ds_collectionView(collectionView: GeneralCollectionView, titleForHeaderAtSection section: Int) -> String?
 }

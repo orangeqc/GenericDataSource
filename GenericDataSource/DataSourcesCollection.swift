@@ -133,6 +133,11 @@ class DataSourcesCollection {
     func mappingForIndexPath(indexPath: NSIndexPath) -> Mapping {
         fatalError("Should be implemented by subclasses")
     }
+
+    func mappingForSection(section: Int) -> Mapping {
+        let indexPath = NSIndexPath(forRow: 0, inSection: 0)
+        return mappingForIndexPath(indexPath)
+    }
     
     func numberOfSections() -> Int {
         fatalError("Should be implemented by subclasses")
@@ -192,6 +197,18 @@ class DataSourcesCollection {
             let wrapperView = DelegatedGeneralCollectionView(mapping: wrapperMapping)
 
             return (mapping.dataSource, localIndexPath, wrapperView)
+    }
+
+    func collectionViewWrapperFromSection(section: Int, collectionView: GeneralCollectionView) -> (dataSource: DataSource, localSection: Int, wrapperView: DelegatedGeneralCollectionView) {
+        updateMappings()
+
+        let mapping = mappingForSection(section)
+        let localSection = mapping.localSectionForGlobalSection(section)
+        
+        let wrapperMapping = GeneralCollectionViewWrapperMapping(mapping: mapping, view: collectionView)
+        let wrapperView = DelegatedGeneralCollectionView(mapping: wrapperMapping)
+
+        return (mapping.dataSource, localSection, wrapperView)
     }
 }
 
