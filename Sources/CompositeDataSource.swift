@@ -290,6 +290,18 @@ open class CompositeDataSource: AbstractDataSource {
         return transformed.dataSource.ds_collectionView(transformed.collectionView, cellForItemAt: transformed.indexPath)
     }
 
+    public override func ds_collectionView(titleForHeaderAtSection section: Int) -> String? {
+        if let collection = collection as? _MultiSectionDataSourcesCollection {
+            let mapping = collection.mappingForGlobalSection(section)
+            return mapping?.dataSource.ds_collectionView(titleForHeaderAtSection: (mapping?.localSectionForGlobalSection(section))!)
+        }
+        else {
+            return "No title"
+        }
+//        let mapping = collection.collectionViewWrapperFromSection(section, collectionView: collectionView)
+//        return mapping.dataSource.ds_collectionView(mapping.wrapperView, titleForHeaderAtSection: mapping.localSection)
+    }
+
     // MARK: - Size
 
     /**

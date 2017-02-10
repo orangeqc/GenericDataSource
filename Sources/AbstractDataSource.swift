@@ -151,6 +151,13 @@ open class AbstractDataSource: NSObject, DataSource, UITableViewDataSource, UICo
         return cast(cell)
     }
 
+    /**
+      `UITableViewDataSource` forwards calls to the corresponding `DataSource` method (see `ds_collectionView(titleForHeaderAtSection:) -> String?`)
+    */
+    public func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return ds_collectionView(titleForHeaderAtSection: section)
+    }
+
     // MARK: - UICollectionViewDataSource
 
     /**
@@ -336,6 +343,10 @@ open class AbstractDataSource: NSObject, DataSource, UITableViewDataSource, UICo
      */
     open func ds_numberOfItems(inSection section: Int) -> Int {
         fatalError("\(self): \(#function) Should be implemented by subclasses")
+    }
+
+    public func ds_collectionView(titleForHeaderAtSection section: Int) -> String? {
+        return nil
     }
 
     /**

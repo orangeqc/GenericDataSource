@@ -132,6 +132,17 @@ import Foundation
      */
     func ds_collectionView(_ collectionView: GeneralCollectionView, didDeselectItemAt indexPath: IndexPath)
 
+    /**
+     Asks the delegate for the title for a given section.
+
+     - parameter collectionView: A general collection view object initiating the operation.
+     - parameter section:        An index number identifying a section.
+
+     - returns: Optional string for the section title.
+    */
+    func ds_collectionView(titleForHeaderAtSection section: Int) -> String?
+
+
     // MARK: - SupplementaryView
 
     /// Retrieves the supplementary view for the passed kind at the passed index path.

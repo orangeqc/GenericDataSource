@@ -20,6 +20,9 @@ import UIKit
  */
 open class BasicDataSource<ItemType, CellType: ReusableCell> : AbstractDataSource {
 
+    /// Title for the section.
+    public var titleForHeader: String?
+
     private var itemSizeSet: Bool = false
 
     /// The size of the cell. Usually used with a `UICollectionView`.
@@ -335,6 +338,10 @@ open class BasicDataSource<ItemType, CellType: ReusableCell> : AbstractDataSourc
             return super.ds_collectionView(collectionView, didDeselectItemAt: indexPath)
         }
         selectionHandler.dataSource(self, collectionView: collectionView, didDeselectItemAt: indexPath)
+    }
+
+    public override func ds_collectionView(titleForHeaderAtSection section: Int) -> String? {
+        return self.titleForHeader
     }
 }
 
