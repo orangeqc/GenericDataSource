@@ -154,7 +154,7 @@ open class AbstractDataSource: NSObject, DataSource, UITableViewDataSource, UICo
     /**
       `UITableViewDataSource` forwards calls to the corresponding `DataSource` method (see `ds_collectionView(titleForHeaderAtSection:) -> String?`)
     */
-    public func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    public func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         return ds_collectionView(titleForHeaderAtSection: section)
     }
 
@@ -463,17 +463,17 @@ open class AbstractDataSource: NSObject, DataSource, UITableViewDataSource, UICo
     /**
      `UITableViewDataSource`/`UITableViewDelegate` implementations forwards calls to the corresponding `DataSource` methods.
      */
-    open func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let view = ds_collectionView(tableView, supplementaryViewOfKind: UICollectionElementKindSectionHeader, at: IndexPath(item: 0, section: section))
-        return optionalCast(view)
-    }
+//    open func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+//        let view = ds_collectionView(tableView, supplementaryViewOfKind: UICollectionElementKindSectionHeader, at: IndexPath(item: 0, section: section))
+//        return optionalCast(view)
+//    }
 
     /**
      `UITableViewDataSource`/`UITableViewDelegate` implementations forwards calls to the corresponding `DataSource` methods.
      */
-    open func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return ds_collectionView(tableView, sizeForSupplementaryViewOfKind: UICollectionElementKindSectionHeader, at: IndexPath(item: 0, section: section)).height
-    }
+//    open func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+//        return ds_collectionView(tableView, sizeForSupplementaryViewOfKind: UICollectionElementKindSectionHeader, at: IndexPath(item: 0, section: section)).height
+//    }
 
     /**
      `UITableViewDataSource`/`UITableViewDelegate` implementations forwards calls to the corresponding `DataSource` methods.
