@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import GenericDataSource
+import GenericDataSource
 
 class UIKitExtensionsCollectionViewTests: XCTestCase {
 
@@ -26,6 +26,19 @@ class UIKitExtensionsCollectionViewTests: XCTestCase {
         dataSource.items = Report.generate(numberOfReports: 10)
         instance.ds_useDataSource(dataSource)
         dataSource.registerReusableViewsInCollectionView(instance)
+    }
+
+    func testSize() {
+        instance.frame = CGRect(x: 0, y: 0, width: 100, height: 120)
+        XCTAssertEqual(CGSize(width: 100, height: 120), instance.size)
+    }
+
+    func testAsTableView() {
+        XCTAssertEqual(instance, instance.asCollectionView())
+    }
+
+    func testAsCollectionView() {
+        XCTAssertNil(instance.asTableView())
     }
 
     func testUsesDataSource() {

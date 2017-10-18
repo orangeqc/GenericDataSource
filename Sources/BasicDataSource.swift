@@ -18,7 +18,16 @@ import UIKit
 
  For sizing cells, you can use `itemSize` for `UICollectionView` and `itemHeight` for `UITableView`. Or if you want to specify a custom size, you can override `ds_collectionView(_:sizeForItemAt:)`, **but needs** to set `useDelegateForItemSize` to `true` otherwise the overriden method will not be called.
  */
-open class BasicDataSource<ItemType, CellType: ReusableCell> : AbstractDataSource {
+open class BasicDataSource<ItemType, CellType: ReusableCell> : AbstractDataSource, BasicDataSourceRepresentable {
+
+    /// Returns a string that describes the contents of the receiver.
+    open override var description: String {
+        let properties: [(String, Any?)] = [
+            ("itemSize", itemSizeSet ? itemSize : nil),
+            ("scrollViewDelegate", scrollViewDelegate),
+            ("supplementaryViewCreator", supplementaryViewCreator)]
+        return describe(self, properties: properties)
+    }
 
     /// Title for the section.
     public var titleForHeader: String?
@@ -53,12 +62,19 @@ open class BasicDataSource<ItemType, CellType: ReusableCell> : AbstractDataSourc
     @available(*, unavailable, message: "Now, we can detect if you implemented sizeForItemAt or not")
     open var useDelegateForItemSize: Bool = false
 
+    /// Represents the underlying data source which is `self`.
+    open var dataSource: AbstractDataSource { return self }
+
+    /// A closure to be called when the items array has been updated.
+    open var onItemsUpdated: (([ItemType]) -> Void)?
+
     /**
      Represents the list of items managed by this basic data source.
      */
     open var items: [ItemType] = [] {
         didSet {
             selectionHandler?.dataSourceItemsModified(self)
+            onItemsUpdated?(items)
         }
     }
 
@@ -66,7 +82,7 @@ open class BasicDataSource<ItemType, CellType: ReusableCell> : AbstractDataSourc
     open let reuseIdentifier: String
 
     /// Represents the selection handler used for delegating calls to selection handler.
-    private var selectionHandler: AnyDataSourceSelectionHandler<ItemType, CellType>? = nil
+    private var selectionHandler: AnyDataSourceSelectionHandler<ItemType, CellType>?
 
     /**
      Sets the selection handler used for delegating selection, highlighting calls to it.
@@ -87,34 +103,37 @@ open class BasicDataSource<ItemType, CellType: ReusableCell> : AbstractDataSourc
         self.reuseIdentifier = reuseIdentifier
     }
 
-    // MARK: - Items
-
-    /**
-     Gets the item at the specified index path.
-
-     **IMPORTANT* This method assumes that the `indexPath` is a local value. In other words, value of (0 0) returns first one. Value of (1 0) returns the second one even if the `BasicDataSource` is part of a `CompositeDataSource`.
-
-     - parameter indexPath: The index path parameter, the section value is ignored.
-
-     - returns: The item at a certain index path.
-     */
-    open func item(at indexPath: IndexPath) -> ItemType {
-        return items[indexPath.item]
-    }
-
-    /**
-     Replaces an item at a certain index path.
-
-     **IMPORTANT* This method assumes that the `indexPath` is a local value. In other words, value of (0 0) replaces the first one. Value of (1 0) replaces the second one even if the `BasicDataSource` is part of a `CompositeDataSource`.
-
-     - parameter indexPath:  The index path parameter, the section value is ignored.
-     - parameter item:      The new item that will be saved in the `items` array.
-     */
-    open func replaceItem(at indexPath: IndexPath, with item: ItemType) {
-        items[indexPath.item] = item
+    /// Providing a way to use the default reuse Id (`Cell.ds_reuseId`) which represents the class name.
+    /// Usually (**99.99% of the times**) we register the cell once. So a unique name would be the `Cell.ds_reuseId`.
+    ///
+    /// You can use one of the following recommended methods to register cells:
+    ///
+    ///     extension GeneralCollectionView {
+    ///         func ds_register(cellNib cell: ReusableCell.Type, in bundle: Bundle? = nil)
+    ///         func ds_register(cellClass cell: ReusableCell.Type)
+    ///     }
+    public override init() {
+        self.reuseIdentifier = CellType.ds_reuseId
     }
 
     // MARK: - DataSource
+
+    /// Asks the data source if it responds to a given selector.
+    ///
+    /// This method returns `true` if the optional selector is overwritten by subclasses. Otherwise, it returns false.
+    ///
+    /// - Parameter selector: The selector to check if the instance repsonds to.
+    /// - Returns: `true` if the instance responds to the passed selector, otherwise `false`.
+    open override func ds_responds(to selector: DataSourceSelector) -> Bool {
+        if selector == .size && itemSizeSet {
+            return true
+        }
+
+        // we always define last one as DataSource selector.
+        let theSelector = dataSourceSelectorToSelectorMapping[selector]!.last!
+        // check if the subclass implemented the selector, always return true
+        return subclassHasDifferentImplmentation(type: BasicDataSource.self, selector: theSelector)
+    }
 
     // MARK: Cell
 
@@ -189,26 +208,6 @@ open class BasicDataSource<ItemType, CellType: ReusableCell> : AbstractDataSourc
     }
 
     // MARK: Size
-
-    /**
-     Whether the data source provides the item size/height delegate calls for `tableView:heightForRowAtIndexPath:`
-     or `collectionView:layout:sizeForItemAt:` or not.
-
-     It returns the value of `useDelegateForItemSize`. Usually, it returns `true`,
-     if you set `itemSize` or `itemHeight`.
-
-
-     - returns: `true`, if the data source object will consume the delegate calls.
-     `false` if the size/height information is provided to the `UITableView` using `rowHeight` and/or `estimatedRowHeight`
-     or to the `UICollectionViewFlowLayout` using `itemSize` and/or `estimatedItemSize`.
-     */
-    open override func ds_shouldConsumeItemSizeDelegateCalls() -> Bool {
-        let selector = #selector(DataSource.ds_collectionView(_:sizeForItemAt:))
-        let subclassImp = method_getImplementation(class_getInstanceMethod(type(of: self), selector))
-        let superImp = method_getImplementation(class_getInstanceMethod(BasicDataSource.self, selector))
-
-        return itemSizeSet || (subclassImp != superImp)
-    }
 
     /**
      Gets the size for an item at certain index path. The default implementation uses the value specified by `itemSize` or `itemHeight`.
@@ -342,19 +341,5 @@ open class BasicDataSource<ItemType, CellType: ReusableCell> : AbstractDataSourc
 
     public override func ds_collectionView(titleForHeaderAtSection section: Int) -> String? {
         return self.titleForHeader
-    }
-}
-
-extension BasicDataSource where ItemType : Equatable {
-
-    /**
-     Gets the index path for a certain item.
-
-     - parameter item: The item that is being checked.
-
-     - returns: The index path for a certain item, or `nil` if there is no such item.
-     */
-    open func indexPath(for item: ItemType) -> IndexPath? {
-        return items.index(of: item).flatMap { IndexPath(item: $0, section: 0) }
     }
 }

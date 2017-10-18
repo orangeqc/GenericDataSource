@@ -8,7 +8,7 @@
 
 import UIKit
 import XCTest
-@testable import GenericDataSource
+import GenericDataSource
 
 protocol MockReusableView: GeneralCollectionView {
 
@@ -32,7 +32,7 @@ class MockTableView: UITableView {
             return
         }
         guard let theCellClass = cellClass as? UITableViewCell.Type else {
-            assertionFailure("'\(cellClass)' should be of type UITableViewCell")
+            assertionFailure("'\(String(describing: cellClass))' should be of type UITableViewCell")
             return
         }
 
@@ -64,7 +64,7 @@ class MockTableView: UITableView {
 
     override func dequeueReusableHeaderFooterView(withIdentifier identifier: String) -> UITableViewHeaderFooterView? {
         let viewClass = reusableHeaders[identifier]
-        return viewClass?.init()
+        return viewClass?.init(reuseIdentifier: identifier)
     }
 
     func queryDataSource() {
@@ -132,7 +132,7 @@ class MockCollectionView: UICollectionView {
             return
         }
         guard let theCellClass = cellClass as? UICollectionViewCell.Type else {
-            assertionFailure("'\(cellClass)' should be of type UITableViewCell")
+            assertionFailure("'\(String(describing: cellClass))' should be of type UITableViewCell")
             return
         }
 
